@@ -56,36 +56,70 @@ class Transforms:
 
 @dataclass
 class Entity:
-    transforms: Transforms
-    children: list["Entity"]
+    transforms: Transforms = field(default_factory=lambda: Transforms())
+    children: list["Entity"] = field(default_factory=lambda: [])
 
     def update(
         self,
+        *,  # allow only named arguments
         delta_time: float,
+        parent: Optional["Entity"],
+        global_transforms: Transforms,
+    ):
+        ...
+
+    def draw(
+        self,
+        *,  # allow only named arguments
+        screen: pygame.Surface,
+        parent: Optional["Entity"],
+        global_transforms: Transforms,
+    ):
+        ...
+
+    def __tick(
+        self,
+        delta_time: float,
+        screen: pygame.Surface,
         parent: Optional["Entity"] = None,
         parent_transforms: Optional[Transforms] = None,
     ):
+        global_transforms = (
+            parent_transforms + self.transforms
+            if parent_transforms
+            else self.transforms
+        )
+        self.update(
+            delta_time=delta_time,
+            parent=parent,
+            global_transforms=global_transforms,
+        )
+        self.draw(
+            screen=screen,
+            parent=parent,
+            global_transforms=global_transforms,
+        )
         for child in self.children:
-            child.update(
-                delta_time,
-                self,
-                parent_transforms + self.transforms
-                if parent_transforms
-                else self.transforms,
-            )
+            child.__tick(delta_time, screen, self, global_transforms)
 
-    def draw(self, screen: pygame.Surface):
-        for child in self.children:
-            child.draw(screen)
+    def tick(
+        self,
+        delta_time: float,
+        screen: pygame.Surface,
+        background_color: pygame.Color = pygame.Color("white"),
+    ):
+        screen.fill(background_color)
+        self.__tick(delta_time, screen)
+        pygame.display.flip()
 
-    def tick(self, delta_time: float, screen: pygame.Surface):
-        self.update(delta_time)
-        self.draw(screen)
-
-    def mainloop(self, screen: pygame.Surface):
+    def mainloop(
+        self,
+        screen: pygame.Surface,
+        background_color: pygame.Color = pygame.Color("white"),
+    ):
         last_time_stamp = time.perf_counter()
         while pygame.QUIT not in map(lambda e: e.type, pygame.event.get()):
             time_stamp = time.perf_counter()
             delta_time = time_stamp - last_time_stamp
-            self.tick(delta_time, screen)
+            self.tick(delta_time, screen, background_color)
             last_time_stamp = time_stamp
