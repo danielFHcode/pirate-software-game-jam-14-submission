@@ -17,3 +17,4 @@ class Rectangle(Entity):
             screen, self.color, pygame.Rect((self.x, self.y), (self.width, self.height))
         )
         return super().draw(screen)
+print("lsd")
