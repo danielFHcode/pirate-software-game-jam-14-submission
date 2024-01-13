@@ -56,4 +56,3 @@ class Something(Entity):
 pygame.init()
 screen = pygame.display.set_mode((800, 450), pygame.RESIZABLE)
 Something().mainloop(screen)
-print("lsd")
