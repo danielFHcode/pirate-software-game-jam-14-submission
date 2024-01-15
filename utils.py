@@ -13,7 +13,7 @@ class Rectangle(Entity):
         parent: Entity | None,
         global_transforms: Transforms
     ):
-        surface = pygame.Surface((global_transforms.size.x, global_transforms.size.y))
+        surface = pygame.Surface((global_transforms.size.x, global_transforms.size.y), pygame.SRCALPHA)
         surface.fill(self.color)
         screen.blit(
             pygame.transform.rotozoom(surface, global_transforms.angle, 1),
