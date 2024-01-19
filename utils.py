@@ -22,3 +22,16 @@ class Rectangle(Entity):
                 global_transforms.position.y + global_transforms.center.x,
             ),
         )
+
+@dataclass
+class Circle(Entity):
+    color: pygame.Color = field(default_factory=lambda: pygame.Color(0, 0, 0, 0))
+
+    def draw(
+        self,
+        *,
+        screen: pygame.Surface,
+        parent: Entity | None,
+        global_transforms: Transforms
+    ):
+        pygame.draw.circle(screen, self.color, (global_transforms.position.x+global_transforms.center.x, global_transforms.position.y+global_transforms.center.y), global_transforms.size.x)
